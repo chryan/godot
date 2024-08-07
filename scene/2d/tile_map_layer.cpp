@@ -446,9 +446,9 @@ void TileMapLayer::_rendering_notification(int p_what) {
 				for (const LocalVector<RID> &polygons : cell_data.occluders) {
 					for (const RID &rid : polygons) {
 						if (rid.is_null()) {
-						continue;
-					}
-					Transform2D xform(0, tile_set->map_to_local(kv.key));
+							continue;
+						}
+						Transform2D xform(0, tile_set->map_to_local(kv.key));
 						rs->canvas_light_occluder_attach_to_canvas(rid, get_canvas());
 						rs->canvas_light_occluder_set_transform(rid, tilemap_xform * xform);
 					}
@@ -457,8 +457,8 @@ void TileMapLayer::_rendering_notification(int p_what) {
 		}
 	} else if (p_what == NOTIFICATION_RESET_PHYSICS_INTERPOLATION) {
 		if (is_physics_interpolated_and_enabled() && is_visible_in_tree()) {
-		for (const KeyValue<Vector2i, Ref<RenderingQuadrant>> &kv : rendering_quadrant_map) {
-			for (const RID &ci : kv.value->canvas_items) {
+			for (const KeyValue<Vector2i, Ref<RenderingQuadrant>> &kv : rendering_quadrant_map) {
+				for (const RID &ci : kv.value->canvas_items) {
 					if (ci.is_valid()) {
 						rs->canvas_item_reset_physics_interpolation(ci);
 					}
@@ -561,8 +561,8 @@ void TileMapLayer::_rendering_occluders_clear_cell(CellData &r_cell_data) {
 	// Free the occluders.
 	for (const LocalVector<RID> &polygons : r_cell_data.occluders) {
 		for (const RID &rid : polygons) {
-		rs->free(rid);
-	}
+			rs->free(rid);
+		}
 	}
 	r_cell_data.occluders.clear();
 }
@@ -573,10 +573,10 @@ void TileMapLayer::_rendering_occluders_update_cell(CellData &r_cell_data) {
 	// Free unused occluders then resize the occluders array.
 	for (uint32_t i = tile_set->get_occlusion_layers_count(); i < r_cell_data.occluders.size(); i++) {
 		for (const RID &occluder_id : r_cell_data.occluders[i]) {
-		if (occluder_id.is_valid()) {
-			rs->free(occluder_id);
+			if (occluder_id.is_valid()) {
+				rs->free(occluder_id);
+			}
 		}
-	}
 	}
 	r_cell_data.occluders.resize(tile_set->get_occlusion_layers_count());
 
@@ -617,30 +617,30 @@ void TileMapLayer::_rendering_occluders_update_cell(CellData &r_cell_data) {
 					for (uint32_t occlusion_polygon_index = 0; occlusion_polygon_index < occluders.size(); occlusion_polygon_index++) {
 						RID &occluder = occluders[occlusion_polygon_index];
 						Ref<OccluderPolygon2D> occluder_polygon = tile_data->get_occluder_polygon(occlusion_layer_index, occlusion_polygon_index);
-					if (occluder_polygon.is_valid()) {
-						// Create or update occluder.
+						if (occluder_polygon.is_valid()) {
+							// Create or update occluder.
 
-						Transform2D xform;
-						xform.set_origin(tile_set->map_to_local(r_cell_data.coords));
-						if (!occluder.is_valid()) {
-							occluder = rs->canvas_light_occluder_create();
-							if (needs_set_not_interpolated) {
-								rs->canvas_light_occluder_set_interpolated(occluder, false);
+							Transform2D xform;
+							xform.set_origin(tile_set->map_to_local(r_cell_data.coords));
+							if (!occluder.is_valid()) {
+								occluder = rs->canvas_light_occluder_create();
+								if (needs_set_not_interpolated) {
+									rs->canvas_light_occluder_set_interpolated(occluder, false);
+								}
+							}
+							rs->canvas_light_occluder_set_transform(occluder, get_global_transform() * xform);
+							rs->canvas_light_occluder_set_polygon(occluder, tile_data->get_occluder_polygon(occlusion_layer_index, occlusion_polygon_index, flip_h, flip_v, transpose)->get_rid());
+							rs->canvas_light_occluder_attach_to_canvas(occluder, get_canvas());
+							rs->canvas_light_occluder_set_light_mask(occluder, tile_set->get_occlusion_layer_light_mask(occlusion_layer_index));
+							rs->canvas_light_occluder_set_as_sdf_collision(occluder, tile_set->get_occlusion_layer_sdf_collision(occlusion_layer_index));
+						} else {
+							// Clear occluder.
+							if (occluder.is_valid()) {
+								rs->free(occluder);
+								occluder = RID();
 							}
 						}
-						rs->canvas_light_occluder_set_transform(occluder, get_global_transform() * xform);
-							rs->canvas_light_occluder_set_polygon(occluder, tile_data->get_occluder_polygon(occlusion_layer_index, occlusion_polygon_index, flip_h, flip_v, transpose)->get_rid());
-						rs->canvas_light_occluder_attach_to_canvas(occluder, get_canvas());
-						rs->canvas_light_occluder_set_light_mask(occluder, tile_set->get_occlusion_layer_light_mask(occlusion_layer_index));
-						rs->canvas_light_occluder_set_as_sdf_collision(occluder, tile_set->get_occlusion_layer_sdf_collision(occlusion_layer_index));
-					} else {
-						// Clear occluder.
-						if (occluder.is_valid()) {
-							rs->free(occluder);
-							occluder = RID();
-						}
 					}
-				}
 				}
 
 				return;
@@ -1726,11 +1726,13 @@ void TileMapLayer::_physics_interpolated_changed() {
 	}
 
 	for (const KeyValue<Vector2i, CellData> &E : tile_map_layer_data) {
-		for (const RID &occluder : E.value.occluders) {
-			if (occluder.is_valid()) {
-				rs->canvas_light_occluder_set_interpolated(occluder, interpolated);
-				if (needs_reset) {
-					rs->canvas_light_occluder_reset_physics_interpolation(occluder);
+		for (const LocalVector<RID> &occluders : E.value.occluders) {
+			for (const RID &occluder : occluders) {
+				if (occluder.is_valid()) {
+					rs->canvas_light_occluder_set_interpolated(occluder, interpolated);
+					if (needs_reset) {
+						rs->canvas_light_occluder_reset_physics_interpolation(occluder);
+					}
 				}
 			}
 		}

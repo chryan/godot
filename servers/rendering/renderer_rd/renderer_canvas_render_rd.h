@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef RENDERER_CANVAS_RENDER_RD_H
-#define RENDERER_CANVAS_RENDER_RD_H
+#pragma once
 
 #include "core/templates/lru.h"
 #include "servers/rendering/renderer_canvas_render.h"
@@ -669,5 +668,3 @@ public:
 	RendererCanvasRenderRD();
 	~RendererCanvasRenderRD();
 };
-
-#endif // RENDERER_CANVAS_RENDER_RD_H

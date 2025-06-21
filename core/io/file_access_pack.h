@@ -38,8 +38,12 @@
 
 // Godot's packed file magic header ("GDPC" in ASCII).
 #define PACK_HEADER_MAGIC 0x43504447
+
+#define PACK_FORMAT_VERSION_V2 2
+#define PACK_FORMAT_VERSION_V3 3
+
 // The current packed file format version number.
-#define PACK_FORMAT_VERSION 2
+#define PACK_FORMAT_VERSION PACK_FORMAT_VERSION_V3
 
 enum PackFlags {
 	PACK_DIR_ENCRYPTED = 1 << 0,
@@ -102,7 +106,7 @@ private:
 
 	PackedDir *root = nullptr;
 
-	static PackedData *singleton;
+	static inline PackedData *singleton = nullptr;
 	bool disabled = false;
 
 	void _free_packed_dirs(PackedDir *p_dir);
@@ -125,6 +129,8 @@ public:
 
 	_FORCE_INLINE_ Ref<FileAccess> try_open_path(const String &p_path);
 	_FORCE_INLINE_ bool has_path(const String &p_path);
+
+	_FORCE_INLINE_ int64_t get_size(const String &p_path);
 
 	_FORCE_INLINE_ Ref<DirAccess> try_open_directory(const String &p_path);
 	_FORCE_INLINE_ bool has_directory(const String &p_path);
@@ -155,6 +161,7 @@ public:
 };
 
 class FileAccessPack : public FileAccess {
+	GDSOFTCLASS(FileAccessPack, FileAccess);
 	PackedData::PackedFile pf;
 
 	mutable uint64_t pos;
@@ -164,6 +171,8 @@ class FileAccessPack : public FileAccess {
 	Ref<FileAccess> f;
 	virtual Error open_internal(const String &p_path, int p_mode_flags) override;
 	virtual uint64_t _get_modified_time(const String &p_file) override { return 0; }
+	virtual uint64_t _get_access_time(const String &p_file) override { return 0; }
+	virtual int64_t _get_size(const String &p_file) override { return -1; }
 	virtual BitField<FileAccess::UnixPermissionFlags> _get_unix_permissions(const String &p_file) override { return 0; }
 	virtual Error _set_unix_permissions(const String &p_file, BitField<FileAccess::UnixPermissionFlags> p_permissions) override { return FAILED; }
 
@@ -199,6 +208,19 @@ public:
 	FileAccessPack(const String &p_path, const PackedData::PackedFile &p_file);
 };
 
+int64_t PackedData::get_size(const String &p_path) {
+	String simplified_path = p_path.simplify_path();
+	PathMD5 pmd5(simplified_path.md5_buffer());
+	HashMap<PathMD5, PackedFile, PathMD5>::Iterator E = files.find(pmd5);
+	if (!E) {
+		return -1; // File not found.
+	}
+	if (E->value.offset == 0) {
+		return -1; // File was erased.
+	}
+	return E->value.size;
+}
+
 Ref<FileAccess> PackedData::try_open_path(const String &p_path) {
 	String simplified_path = p_path.simplify_path().trim_prefix("res://");
 	PathMD5 pmd5(simplified_path.md5_buffer());
@@ -224,6 +246,7 @@ bool PackedData::has_directory(const String &p_path) {
 }
 
 class DirAccessPack : public DirAccess {
+	GDSOFTCLASS(DirAccessPack, DirAccess);
 	PackedData::PackedDir *current;
 
 	List<String> list_dirs;

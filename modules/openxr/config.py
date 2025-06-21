@@ -17,7 +17,10 @@ def get_doc_classes():
         "OpenXRActionSet",
         "OpenXRActionMap",
         "OpenXRAPIExtension",
+        "OpenXRExtensionWrapper",
         "OpenXRExtensionWrapperExtension",
+        "OpenXRFutureResult",
+        "OpenXRFutureExtension",
         "OpenXRInteractionProfile",
         "OpenXRInteractionProfileMetadata",
         "OpenXRIPBinding",
@@ -37,6 +40,9 @@ def get_doc_classes():
         "OpenXRBindingModifierEditor",
         "OpenXRHapticBase",
         "OpenXRHapticVibration",
+        "OpenXRRenderModelExtension",
+        "OpenXRRenderModel",
+        "OpenXRRenderModelManager",
     ]
 
 

@@ -42,7 +42,7 @@
 Vector<String> get_editor_locales() {
 	Vector<String> locales;
 
-	EditorTranslationList *etl = _editor_translations;
+	const EditorTranslationList *etl = _editor_translations;
 	while (etl->data) {
 		const String &locale = etl->lang;
 		locales.push_back(locale);
@@ -56,12 +56,12 @@ Vector<String> get_editor_locales() {
 void load_editor_translations(const String &p_locale) {
 	const Ref<TranslationDomain> domain = TranslationServer::get_singleton()->get_or_add_domain("godot.editor");
 
-	EditorTranslationList *etl = _editor_translations;
+	const EditorTranslationList *etl = _editor_translations;
 	while (etl->data) {
 		if (etl->lang == p_locale) {
 			Vector<uint8_t> data;
 			data.resize(etl->uncomp_size);
-			int ret = Compression::decompress(data.ptrw(), etl->uncomp_size, etl->data, etl->comp_size, Compression::MODE_DEFLATE);
+			const int64_t ret = Compression::decompress(data.ptrw(), etl->uncomp_size, etl->data, etl->comp_size, Compression::MODE_DEFLATE);
 			ERR_FAIL_COND_MSG(ret == -1, "Compressed file is corrupt.");
 
 			Ref<FileAccessMemory> fa;
@@ -84,12 +84,12 @@ void load_editor_translations(const String &p_locale) {
 void load_property_translations(const String &p_locale) {
 	const Ref<TranslationDomain> domain = TranslationServer::get_singleton()->get_or_add_domain("godot.properties");
 
-	PropertyTranslationList *etl = _property_translations;
+	const PropertyTranslationList *etl = _property_translations;
 	while (etl->data) {
 		if (etl->lang == p_locale) {
 			Vector<uint8_t> data;
 			data.resize(etl->uncomp_size);
-			int ret = Compression::decompress(data.ptrw(), etl->uncomp_size, etl->data, etl->comp_size, Compression::MODE_DEFLATE);
+			const int64_t ret = Compression::decompress(data.ptrw(), etl->uncomp_size, etl->data, etl->comp_size, Compression::MODE_DEFLATE);
 			ERR_FAIL_COND_MSG(ret == -1, "Compressed file is corrupt.");
 
 			Ref<FileAccessMemory> fa;
@@ -112,12 +112,12 @@ void load_property_translations(const String &p_locale) {
 void load_doc_translations(const String &p_locale) {
 	const Ref<TranslationDomain> domain = TranslationServer::get_singleton()->get_or_add_domain("godot.documentation");
 
-	DocTranslationList *dtl = _doc_translations;
+	const DocTranslationList *dtl = _doc_translations;
 	while (dtl->data) {
 		if (dtl->lang == p_locale) {
 			Vector<uint8_t> data;
 			data.resize(dtl->uncomp_size);
-			int ret = Compression::decompress(data.ptrw(), dtl->uncomp_size, dtl->data, dtl->comp_size, Compression::MODE_DEFLATE);
+			const int64_t ret = Compression::decompress(data.ptrw(), dtl->uncomp_size, dtl->data, dtl->comp_size, Compression::MODE_DEFLATE);
 			ERR_FAIL_COND_MSG(ret == -1, "Compressed file is corrupt.");
 
 			Ref<FileAccessMemory> fa;
@@ -140,12 +140,12 @@ void load_doc_translations(const String &p_locale) {
 void load_extractable_translations(const String &p_locale) {
 	const Ref<TranslationDomain> domain = TranslationServer::get_singleton()->get_or_add_domain("godot.editor");
 
-	ExtractableTranslationList *etl = _extractable_translations;
+	const ExtractableTranslationList *etl = _extractable_translations;
 	while (etl->data) {
 		if (etl->lang == p_locale) {
 			Vector<uint8_t> data;
 			data.resize(etl->uncomp_size);
-			int ret = Compression::decompress(data.ptrw(), etl->uncomp_size, etl->data, etl->comp_size, Compression::MODE_DEFLATE);
+			const int64_t ret = Compression::decompress(data.ptrw(), etl->uncomp_size, etl->data, etl->comp_size, Compression::MODE_DEFLATE);
 			ERR_FAIL_COND_MSG(ret == -1, "Compressed file is corrupt.");
 
 			Ref<FileAccessMemory> fa;
@@ -166,7 +166,7 @@ void load_extractable_translations(const String &p_locale) {
 }
 
 Vector<Vector<String>> get_extractable_message_list() {
-	ExtractableTranslationList *etl = _extractable_translations;
+	const ExtractableTranslationList *etl = _extractable_translations;
 	Vector<Vector<String>> list;
 
 	while (etl->data) {
@@ -177,7 +177,7 @@ Vector<Vector<String>> get_extractable_message_list() {
 
 		Vector<uint8_t> data;
 		data.resize(etl->uncomp_size);
-		int ret = Compression::decompress(data.ptrw(), etl->uncomp_size, etl->data, etl->comp_size, Compression::MODE_DEFLATE);
+		const int64_t ret = Compression::decompress(data.ptrw(), etl->uncomp_size, etl->data, etl->comp_size, Compression::MODE_DEFLATE);
 		ERR_FAIL_COND_V_MSG(ret == -1, list, "Compressed file is corrupt.");
 
 		Ref<FileAccessMemory> fa;

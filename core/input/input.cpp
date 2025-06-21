@@ -73,8 +73,6 @@ static const char *_joy_axes[(size_t)JoyAxis::SDL_MAX] = {
 	"righttrigger",
 };
 
-Input *Input::singleton = nullptr;
-
 void (*Input::set_mouse_mode_func)(Input::MouseMode) = nullptr;
 Input::MouseMode (*Input::get_mouse_mode_func)() = nullptr;
 void (*Input::set_mouse_mode_override_func)(Input::MouseMode) = nullptr;
@@ -1594,8 +1592,8 @@ void Input::parse_mapping(const String &p_mapping) {
 			continue;
 		}
 
-		String output = entry[idx].get_slice(":", 0).replace(" ", "");
-		String input = entry[idx].get_slice(":", 1).replace(" ", "");
+		String output = entry[idx].get_slicec(':', 0).remove_char(' ');
+		String input = entry[idx].get_slicec(':', 1).remove_char(' ');
 		if (output.length() < 1 || input.length() < 2) {
 			continue;
 		}

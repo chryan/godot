@@ -2194,6 +2194,14 @@ void TileMapLayer::_bind_methods() {
 #endif // NAVIGATION_2D_DISABLED
 
 	ADD_SIGNAL(MethodInfo(CoreStringName(changed)));
+	// ST_EDIT @rchew begin
+	ADD_SIGNAL(MethodInfo(SNAME("cell_changed"),
+		PropertyInfo(Variant::VECTOR2I, "coords"),
+		PropertyInfo(Variant::INT, "source_id"),
+		PropertyInfo(Variant::VECTOR2I, "atlas_coords"),
+		PropertyInfo(Variant::INT, "alternative_tile"))
+	);
+	// ST_EDIT @rchew end
 
 	ADD_PROPERTY_DEFAULT("tile_map_data_format", TileMapDataFormat::TILE_MAP_DATA_FORMAT_1);
 
@@ -2721,6 +2729,9 @@ void TileMapLayer::set_cell(const Vector2i &p_coords, int p_source_id, const Vec
 	c.source_id = source_id;
 	c.set_atlas_coords(atlas_coords);
 	c.alternative_tile = alternative_tile;
+	// ST_EDIT @rchew begin
+	emit_signal(SNAME("cell_changed"), p_coords, p_source_id, atlas_coords, p_alternative_tile);
+	// ST_EDIT @rchew end
 
 	// Make the given cell dirty.
 	if (!E->value.dirty_list_element.in_list()) {
